@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>Soma com Regra de 10</title>
+</head>
+<body>
+
+  <h2>Soma com Limite (10)</h2>
+
+  <label>Digite os números separados por vírgula:</label><br><br>
+  <input type="text" id="numeros" placeholder="Ex: 2,3,5,10" style="width:220px;"><br><br>
+
+  <button onclick="somar()">Calcular</button>
+
+  <h3 id="resultado"></h3>
+
+  <script>
+    function somar() {
+      let entrada = document.getElementById("numeros").value;
+
+      let numeros = entrada
+        .split(",")
+        .map(n => parseFloat(n.trim()));
+
+      let soma = 0;
+      let status = "";
+
+      for (let i = 0; i < numeros.length; i++) {
+        let valor = numeros[i];
+
+        if (isNaN(valor)) continue;
+
+        if (soma + valor > 10) {
+          status = "Maior que 10";
+          break;
+        }
+
+        soma += valor;
+
+        if (soma === 10) {
+          status = "Soma = 10";
+          break;
+        }
+      }
+
+      if (status === "") {
+        status = "Soma = " + soma;
+      }
+
+      document.getElementById("resultado").innerText = status;
+    }
+  </script>
+
+</body>
+</html>

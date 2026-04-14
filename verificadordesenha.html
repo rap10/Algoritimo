@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>Verificador de Senha</title>
+</head>
+<body>
+
+  <h2>Verificador de Senha</h2>
+
+  <label>Digite as senhas separadas por vírgula:</label><br><br>
+  <input type="text" id="senhas" placeholder="Ex: 1111,2222,3333,1234" style="width:300px;"><br><br>
+
+  <button onclick="verificarSenha()">Verificar</button>
+
+  <h3 id="resultado"></h3>
+
+  <script>
+    function verificarSenha() {
+      let entrada = document.getElementById("senhas").value;
+
+      let senhas = entrada.split(",").map(s => s.trim());
+
+      let senhaCorreta = "1234";
+      let acesso = false;
+
+      for (let i = 0; i < senhas.length; i++) {
+        if (senhas[i] === senhaCorreta) {
+          acesso = true;
+          break;
+        }
+      }
+
+      document.getElementById("resultado").innerText =
+        acesso ? "Acesso permitido" : "Acesso negado";
+    }
+  </script>
+
+</body>
+</html>

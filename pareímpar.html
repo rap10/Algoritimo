@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>Par ou Ímpar</title>
+</head>
+<body>
+
+  <h2>Verificador de Par ou Ímpar</h2>
+
+  <label>Digite um número:</label>
+  <input type="number" id="numero"><br><br>
+
+  <button onclick="verificar()">Verificar</button>
+
+  <h3 id="resultado"></h3>
+
+  <script>
+    function verificar() {
+      let num = parseInt(document.getElementById("numero").value);
+
+      let resultado = (num % 2 === 0) ? "Par" : "Ímpar";
+
+      document.getElementById("resultado").innerText = resultado;
+    }
+  </script>
+
+</body>
+</html>

@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>Soma de valores </title>
+</head>
+<body>
+
+  <h2>Calculadora de Soma de valores</h2>
+
+  <label>Primeiro valor:</label>
+  <input type="number" class="num"><br><br>
+
+  <label>Segundo valor:</label>
+  <input type="number" class="num"><br><br>
+
+  <label>Terceiro valor:</label>
+  <input type="number" class="num"><br><br>
+
+  <label>Quarto valor:</label>
+  <input type="number" class="num"><br><br>
+
+  <label>Quinto valor:</label>
+  <input type="number" class="num"><br><br>
+
+  <button onclick="somar()">Somar</button>
+
+  <h3 id="resultado"></h3>
+
+  <script>
+    function somar() {
+      let inputs = document.querySelectorAll(".num");
+      let soma = 0;
+
+      inputs.forEach(input => {
+        let valor = parseFloat(input.value);
+
+        // só soma se o campo não estiver vazio ou inválido
+        if (!isNaN(valor)) {
+          soma += valor;
+        }
+      });
+
+      document.getElementById("resultado").innerText = "Resultado: " + soma;
+    }
+  </script>
+
+</body>
+</html>

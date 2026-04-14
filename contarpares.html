@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>Contador de Números Pares</title>
+</head>
+<body>
+
+  <h2>Contador de Números Pares</h2>
+
+  <label>Digite os números separados por vírgula:</label><br><br>
+  <input type="text" id="sequencia" placeholder="Ex: 1,2,3,4,5,6" style="width:250px;"><br><br>
+
+  <button onclick="contarPares()">Verificar</button>
+
+  <h3 id="resultado"></h3>
+
+  <script>
+    function contarPares() {
+      let valores = document.getElementById("sequencia").value;
+
+      let numeros = valores.split(",").map(num => parseInt(num.trim()));
+
+      let pares = [];
+
+      numeros.forEach(num => {
+        if (!isNaN(num) && num % 2 === 0) {
+          pares.push(num);
+        }
+      });
+
+      document.getElementById("resultado").innerHTML =
+        pares.length + " números pares: " + pares.join(", ");
+    }
+  </script>
+
+</body>
+</html>

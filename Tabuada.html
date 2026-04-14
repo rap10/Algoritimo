@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>Tabuada até 10</title>
+</head>
+<body>
+
+  <h2>Pesquisador de Tabuada</h2>
+
+  <label>Digite um número:</label>
+  <input type="number" id="numero"><br><br>
+
+  <button onclick="gerarTabuada()">Gerar Tabuada</button>
+
+  <h3>Resultado:</h3>
+  <div id="resultado"></div>
+
+  <script>
+    function gerarTabuada() {
+      let num = parseInt(document.getElementById("numero").value);
+      let resultado = "";
+
+      for (let i = 1; i <= 10; i++) {
+        resultado += num + " x " + i + " = " + (num * i) + "<br>";
+      }
+
+      document.getElementById("resultado").innerHTML = resultado;
+    }
+  </script>
+
+</body>
+</html>

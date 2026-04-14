@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>Verificador de Média</title>
+</head>
+<body>
+
+  <h2>Verificador de Médias</h2>
+
+  <label>Digite as notas separadas por vírgula:</label><br><br>
+  <input type="text" id="notas" placeholder="Ex: 8,7,9" style="width:200px;"><br><br>
+
+  <button onclick="calcularMedia()">Calcular</button>
+
+  <h3 id="resultado"></h3>
+
+  <script>
+    function calcularMedia() {
+      let entrada = document.getElementById("notas").value;
+
+      let notas = entrada
+        .split(",")
+        .map(n => parseFloat(n.trim()))
+        .filter(n => !isNaN(n));
+
+      let soma = 0;
+
+      for (let i = 0; i < notas.length; i++) {
+        soma += notas[i];
+      }
+
+      let media = soma / notas.length;
+
+      let situacao = (media >= 6) ? "Aprovado" : "Reprovado";
+
+      document.getElementById("resultado").innerText =
+        "Média: " + media.toFixed(0) +  " Situação: " + situacao;
+
+    }
+  </script>
+
+</body>
+</html>

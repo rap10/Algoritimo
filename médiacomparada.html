@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>Média com Parada</title>
+</head>
+<body>
+
+  <h2>Média Aritmética com Parada (-1)</h2>
+
+  <label>Digite os números (separados por vírgula):</label><br><br>
+  <input type="text" id="numeros" placeholder="Ex: 7,8,6,-1" style="width:200px;"><br><br>
+
+  <button onclick="calcularMedia()">Calcular</button>
+
+  <h3 id="resultado"></h3>
+
+  <script>
+    function calcularMedia() {
+      let entrada = document.getElementById("numeros").value;
+
+      let numeros = entrada.split(",").map(n => parseFloat(n.trim()));
+
+      let soma = 0;
+      let contador = 0;
+
+      for (let i = 0; i < numeros.length; i++) {
+        if (numeros[i] === -1) {
+          break; // para a execução
+        }
+
+        if (!isNaN(numeros[i])) {
+          soma += numeros[i];
+          contador++;
+        }
+      }
+
+      let media = soma / contador;
+
+      document.getElementById("resultado").innerText =
+        "Média: " + media;
+    }
+  </script>
+
+</body>
+</html>

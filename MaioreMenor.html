@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>Maior e Menor Número</title>
+</head>
+<body>
+
+  <h2>Identificador de Maior e Menor Número</h2>
+
+  <label>Digite os números separados por vírgula:</label><br><br>
+  <input type="text" id="numeros" placeholder="Ex: 5,9,2,8,1" style="width:250px;"><br><br>
+
+  <button onclick="verificar()">Verificar</button>
+
+  <h3 id="resultado"></h3>
+
+  <script>
+    function verificar() {
+      let entrada = document.getElementById("numeros").value;
+
+      let numeros = entrada
+        .split(",")
+        .map(n => parseFloat(n.trim()))
+        .filter(n => !isNaN(n));
+
+      let maior = numeros[0];
+      let menor = numeros[0];
+
+      for (let i = 1; i < numeros.length; i++) {
+        if (numeros[i] > maior) {
+          maior = numeros[i];
+        }
+        if (numeros[i] < menor) {
+          menor = numeros[i];
+        }
+      }
+
+      document.getElementById("resultado").innerText =
+        "Maior: " + maior + " | Menor: " + menor;
+    }
+  </script>
+
+</body>
+</html>

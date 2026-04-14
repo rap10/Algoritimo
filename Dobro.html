@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>Dobro de um Número</title>
+</head>
+<body>
+
+  <h2>Calculadora de Dobro</h2>
+
+  <label>Digite um número:</label>
+  <input type="number" id="numero"><br><br>
+
+  <button onclick="calcularDobro()">Calcular Dobro</button>
+
+  <h3 id="resultado"></h3>
+
+  <script>
+    function calcularDobro() {
+      let num = parseFloat(document.getElementById("numero").value);
+
+      let dobro = num + num; // ou num * 2
+
+      document.getElementById("resultado").innerText = "resultado: " + dobro;
+    }
+  </script>
+
+</body>
+</html>

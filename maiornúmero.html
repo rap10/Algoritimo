@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>Maior Número</title>
+</head>
+<body>
+
+  <h2>Verificador de Maior Número</h2>
+
+  <label>Primeiro número:</label>
+  <input type="number" id="num1"><br><br>
+
+  <label>Segundo número:</label>
+  <input type="number" id="num2"><br><br>
+
+  <button onclick="verificarMaior()">Verificar</button>
+
+  <h3 id="resultado"></h3>
+
+  <script>
+    function verificarMaior() {
+      let n1 = parseFloat(document.getElementById("num1").value);
+      let n2 = parseFloat(document.getElementById("num2").value);
+
+      let maior;
+
+      if (n1 > n2) {
+        maior = n1;
+      } else {
+        maior = n2;
+      }
+
+      document.getElementById("resultado").innerText = "Maior número: " + maior;
+    }
+  </script>
+
+</body>
+</html>
