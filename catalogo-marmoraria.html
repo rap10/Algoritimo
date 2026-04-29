@@ -1,0 +1,1822 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MMG — Marmoraria</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Syncopate:wght@400;700&family=Jost:wght@200;300;400&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --black: #0a0a0a;
+    --deep: #111210;
+    --charcoal: #1c1e1b;
+    --graphite: #2a2d29;
+    --stone: #3d403c;
+    --smoke: #5a5e58;
+    --silver: #8a8f87;
+    --mist: #b4b8b0;
+    --fog: #d4d8d0;
+    --green-deep: #1a2618;
+    --green-mid: #2d3d2a;
+    --green-accent: #4a6644;
+    --green-light: #6b8f65;
+    --green-muted: #3d5239;
+    --cream: #e8e4de;
+    --white: #f0ede8;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background-color: var(--black);
+    color: var(--cream);
+    font-family: 'Jost', sans-serif;
+    font-weight: 300;
+    overflow-x: hidden;
+  }
+
+  /* NOISE TEXTURE OVERLAY */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+    pointer-events: none;
+    z-index: 9999;
+    opacity: 0.4;
+  }
+
+  /* HEADER */
+  header {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    z-index: 100;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 24px 60px;
+    background: linear-gradient(to bottom, rgba(10,10,10,0.98) 0%, transparent 100%);
+    backdrop-filter: blur(2px);
+  }
+
+  .logo {
+    font-family: 'Syncopate', sans-serif;
+    font-weight: 700;
+    font-size: 1.3rem;
+    letter-spacing: 0.3em;
+    color: var(--white);
+    text-decoration: none;
+  }
+
+  .logo span {
+    color: var(--green-light);
+  }
+
+  nav {
+    display: flex;
+    gap: 40px;
+    align-items: center;
+  }
+
+  nav a {
+    font-family: 'Jost', sans-serif;
+    font-weight: 200;
+    font-size: 0.75rem;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    color: var(--silver);
+    text-decoration: none;
+    transition: color 0.3s;
+  }
+
+  nav a:hover { color: var(--white); }
+
+  .nav-cta {
+    border: 1px solid var(--green-accent) !important;
+    padding: 8px 20px;
+    color: var(--green-light) !important;
+    transition: all 0.3s !important;
+  }
+
+  .nav-cta:hover {
+    background: var(--green-accent) !important;
+    color: var(--white) !important;
+  }
+
+  /* HERO */
+  .hero {
+    height: 100vh;
+    position: relative;
+    display: flex;
+    align-items: flex-end;
+    padding: 80px 60px;
+    overflow: hidden;
+  }
+
+  .hero-bg {
+    position: absolute;
+    inset: 0;
+    background: 
+      radial-gradient(ellipse 80% 60% at 70% 40%, rgba(45,61,42,0.4) 0%, transparent 70%),
+      linear-gradient(135deg, var(--black) 0%, var(--deep) 40%, var(--green-deep) 100%);
+  }
+
+  .hero-grid {
+    position: absolute;
+    inset: 0;
+    background-image: 
+      linear-gradient(rgba(74,102,68,0.06) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(74,102,68,0.06) 1px, transparent 1px);
+    background-size: 80px 80px;
+  }
+
+  .hero-marble-preview {
+    position: absolute;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    width: 45%;
+    overflow: hidden;
+  }
+
+  .hero-marble-preview::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(to right, var(--black) 0%, transparent 40%);
+    z-index: 2;
+  }
+
+  .hero-marble-preview img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    opacity: 0.5;
+    filter: grayscale(20%) contrast(1.1);
+  }
+
+  /* Marble texture SVG background for hero */
+  .hero-texture {
+    position: absolute;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    width: 45%;
+    background: 
+      repeating-linear-gradient(
+        -45deg,
+        transparent,
+        transparent 2px,
+        rgba(180,184,176,0.03) 2px,
+        rgba(180,184,176,0.03) 4px
+      ),
+      linear-gradient(160deg, #1a1f18 0%, #2a3328 30%, #1e2a1c 60%, #151a13 100%);
+    opacity: 0.8;
+  }
+
+  .hero-texture::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(to right, var(--black) 0%, transparent 50%);
+  }
+
+  .hero-content {
+    position: relative;
+    z-index: 10;
+    max-width: 600px;
+  }
+
+  .hero-eyebrow {
+    font-family: 'Syncopate', sans-serif;
+    font-size: 0.6rem;
+    letter-spacing: 0.5em;
+    color: var(--green-light);
+    text-transform: uppercase;
+    margin-bottom: 28px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+
+  .hero-eyebrow::before {
+    content: '';
+    width: 40px;
+    height: 1px;
+    background: var(--green-light);
+  }
+
+  .hero-title {
+    font-family: 'Cormorant Garamond', serif;
+    font-weight: 300;
+    font-size: clamp(3.5rem, 7vw, 6rem);
+    line-height: 0.95;
+    color: var(--white);
+    margin-bottom: 24px;
+  }
+
+  .hero-title em {
+    font-style: italic;
+    color: var(--fog);
+  }
+
+  .hero-subtitle {
+    font-weight: 200;
+    font-size: 0.9rem;
+    letter-spacing: 0.08em;
+    color: var(--silver);
+    line-height: 1.8;
+    margin-bottom: 48px;
+    max-width: 420px;
+  }
+
+  .hero-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 16px;
+    background: var(--green-mid);
+    border: 1px solid var(--green-accent);
+    color: var(--cream);
+    text-decoration: none;
+    padding: 16px 36px;
+    font-family: 'Syncopate', sans-serif;
+    font-size: 0.6rem;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    transition: all 0.4s;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .hero-btn::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: var(--green-accent);
+    transform: translateX(-100%);
+    transition: transform 0.4s ease;
+  }
+
+  .hero-btn:hover::before { transform: translateX(0); }
+  .hero-btn span { position: relative; z-index: 1; }
+
+  .hero-btn-arrow {
+    position: relative;
+    z-index: 1;
+    width: 20px;
+    height: 1px;
+    background: var(--cream);
+  }
+
+  .hero-scroll {
+    position: absolute;
+    bottom: 40px;
+    right: 60px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    color: var(--smoke);
+    font-size: 0.65rem;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    font-family: 'Syncopate', sans-serif;
+  }
+
+  .scroll-line {
+    width: 1px;
+    height: 60px;
+    background: linear-gradient(to bottom, transparent, var(--green-accent));
+    animation: scrollPulse 2s ease-in-out infinite;
+  }
+
+  @keyframes scrollPulse {
+    0%, 100% { opacity: 0.4; transform: scaleY(0.8); }
+    50% { opacity: 1; transform: scaleY(1); }
+  }
+
+  /* SECTION DIVIDER */
+  .section-divider {
+    display: flex;
+    align-items: center;
+    gap: 24px;
+    margin-bottom: 60px;
+  }
+
+  .divider-line {
+    flex: 1;
+    height: 1px;
+    background: linear-gradient(to right, transparent, var(--graphite));
+  }
+
+  .divider-diamond {
+    width: 6px;
+    height: 6px;
+    background: var(--green-accent);
+    transform: rotate(45deg);
+  }
+
+  /* ABOUT STRIP */
+  .about-strip {
+    background: var(--green-deep);
+    border-top: 1px solid var(--green-mid);
+    border-bottom: 1px solid var(--green-mid);
+    padding: 32px 60px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 40px;
+    overflow: hidden;
+  }
+
+  .stat {
+    text-align: center;
+    flex: 1;
+  }
+
+  .stat-num {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 2.8rem;
+    font-weight: 300;
+    color: var(--white);
+    line-height: 1;
+  }
+
+  .stat-label {
+    font-size: 0.65rem;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    color: var(--green-light);
+    margin-top: 6px;
+  }
+
+  .stat-sep {
+    width: 1px;
+    height: 50px;
+    background: var(--green-mid);
+  }
+
+  /* CATALOG SECTION */
+  .catalog-section {
+    padding: 100px 60px;
+    background: var(--deep);
+  }
+
+  .section-header {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    margin-bottom: 80px;
+  }
+
+  .section-tag {
+    font-family: 'Syncopate', sans-serif;
+    font-size: 0.55rem;
+    letter-spacing: 0.5em;
+    color: var(--green-light);
+    text-transform: uppercase;
+    margin-bottom: 16px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .section-tag::before {
+    content: '';
+    width: 24px;
+    height: 1px;
+    background: var(--green-light);
+  }
+
+  .section-title {
+    font-family: 'Cormorant Garamond', serif;
+    font-weight: 300;
+    font-size: clamp(2.2rem, 4vw, 3.5rem);
+    color: var(--white);
+    line-height: 1.1;
+  }
+
+  .section-title em { font-style: italic; color: var(--mist); }
+
+  .view-all {
+    font-family: 'Syncopate', sans-serif;
+    font-size: 0.55rem;
+    letter-spacing: 0.3em;
+    color: var(--green-light);
+    text-decoration: none;
+    text-transform: uppercase;
+    border-bottom: 1px solid var(--green-accent);
+    padding-bottom: 4px;
+    transition: color 0.3s;
+    white-space: nowrap;
+    margin-bottom: 8px;
+  }
+
+  .view-all:hover { color: var(--white); }
+
+  /* FILTER BAR */
+  .filter-bar {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 56px;
+    flex-wrap: wrap;
+  }
+
+  .filter-btn {
+    background: transparent;
+    border: 1px solid var(--graphite);
+    color: var(--silver);
+    padding: 8px 20px;
+    font-family: 'Jost', sans-serif;
+    font-size: 0.7rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: all 0.3s;
+  }
+
+  .filter-btn:hover, .filter-btn.active {
+    background: var(--green-mid);
+    border-color: var(--green-accent);
+    color: var(--cream);
+  }
+
+  /* STONE GRID */
+  .stone-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 2px;
+  }
+
+  .stone-card {
+    position: relative;
+    overflow: hidden;
+    cursor: pointer;
+    background: var(--charcoal);
+    aspect-ratio: 3/4;
+  }
+
+  .stone-card.featured {
+    grid-column: span 2;
+    aspect-ratio: auto;
+  }
+
+  .stone-img-wrapper {
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+  }
+
+  .stone-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    filter: saturate(0.8) contrast(1.05);
+  }
+
+  .stone-card:hover .stone-img {
+    transform: scale(1.06);
+    filter: saturate(1) contrast(1.05);
+  }
+
+  /* Stone texture backgrounds (SVG-based for no-image fallback) */
+  .stone-texture-1 { background: linear-gradient(135deg, #2a2218 0%, #3d3025 30%, #2e251a 60%, #1e1810 100%); }
+  .stone-texture-2 { background: linear-gradient(160deg, #1a1e1a 0%, #252e22 40%, #1c2219 100%); }
+  .stone-texture-3 { background: linear-gradient(145deg, #1e1c1c 0%, #2d2a2a 50%, #1a1818 100%); }
+  .stone-texture-4 { background: linear-gradient(120deg, #18181e 0%, #22222e 45%, #1a1a20 100%); }
+  .stone-texture-5 { background: linear-gradient(150deg, #201e1a 0%, #2e2a24 50%, #181612 100%); }
+  .stone-texture-6 { background: linear-gradient(135deg, #1a1c18 0%, #262820 45%, #1c1e18 100%); }
+  .stone-texture-7 { background: linear-gradient(160deg, #201a1a 0%, #2e2222 50%, #181212 100%); }
+  .stone-texture-8 { background: linear-gradient(140deg, #181818 0%, #242424 45%, #141414 100%); }
+  .stone-texture-9 { background: linear-gradient(155deg, #1a1e16 0%, #282e20 45%, #181c14 100%); }
+
+  .stone-overlay {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(to top, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0.1) 50%, transparent 100%);
+    transition: opacity 0.4s;
+  }
+
+  .stone-card:hover .stone-overlay {
+    background: linear-gradient(to top, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0.3) 60%, rgba(26,38,24,0.2) 100%);
+  }
+
+  .stone-info {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    padding: 32px 28px 28px;
+    transform: translateY(0);
+    transition: transform 0.4s ease;
+  }
+
+  .stone-origin {
+    font-size: 0.6rem;
+    letter-spacing: 0.35em;
+    text-transform: uppercase;
+    color: var(--green-light);
+    margin-bottom: 8px;
+    font-family: 'Syncopate', sans-serif;
+    opacity: 0;
+    transform: translateY(10px);
+    transition: all 0.4s 0.1s;
+  }
+
+  .stone-card:hover .stone-origin {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  .stone-name {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1.6rem;
+    font-weight: 300;
+    color: var(--white);
+    line-height: 1.1;
+    margin-bottom: 6px;
+  }
+
+  .stone-card.featured .stone-name {
+    font-size: 2.4rem;
+  }
+
+  .stone-type {
+    font-size: 0.65rem;
+    letter-spacing: 0.2em;
+    color: var(--mist);
+    text-transform: uppercase;
+  }
+
+  .stone-details {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-top: 16px;
+    opacity: 0;
+    transform: translateY(8px);
+    transition: all 0.4s 0.15s;
+  }
+
+  .stone-card:hover .stone-details {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  .stone-badge {
+    font-size: 0.6rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    padding: 4px 10px;
+    border: 1px solid var(--green-accent);
+    color: var(--green-light);
+  }
+
+  .stone-action {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.65rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--cream);
+    cursor: pointer;
+    margin-left: auto;
+  }
+
+  .stone-action-line {
+    width: 16px;
+    height: 1px;
+    background: var(--cream);
+  }
+
+  /* MARBLE IMAGES using CSS art */
+  .marble-art {
+    width: 100%;
+    height: 100%;
+    position: relative;
+    overflow: hidden;
+  }
+
+  /* Individual stone visual treatments */
+  .marble-carrara {
+    background: 
+      radial-gradient(ellipse 30% 80% at 20% 30%, rgba(180,180,180,0.15) 0%, transparent 60%),
+      radial-gradient(ellipse 40% 60% at 80% 70%, rgba(160,160,155,0.1) 0%, transparent 50%),
+      linear-gradient(170deg, #d4d0c8 0%, #c8c4bc 20%, #b8b4ac 40%, #ccc8c0 60%, #d0ccC4 80%, #c4c0b8 100%);
+  }
+
+  .marble-nero {
+    background: 
+      radial-gradient(ellipse 20% 60% at 30% 20%, rgba(80,75,60,0.4) 0%, transparent 50%),
+      radial-gradient(ellipse 30% 40% at 70% 80%, rgba(60,55,45,0.3) 0%, transparent 40%),
+      linear-gradient(150deg, #0e0e0c 0%, #1a1a16 25%, #141410 50%, #1e1e18 75%, #0a0a08 100%);
+  }
+
+  .marble-verde {
+    background: 
+      radial-gradient(ellipse 35% 70% at 25% 40%, rgba(40,70,35,0.5) 0%, transparent 55%),
+      radial-gradient(ellipse 25% 50% at 75% 60%, rgba(30,55,25,0.4) 0%, transparent 45%),
+      linear-gradient(130deg, #1a2e18 0%, #243c20 30%, #1c3018 60%, #2a4025 80%, #182814 100%);
+  }
+
+  .marble-travertino {
+    background: 
+      repeating-linear-gradient(
+        5deg,
+        transparent 0px, transparent 8px,
+        rgba(160,140,100,0.06) 8px, rgba(160,140,100,0.06) 9px
+      ),
+      linear-gradient(160deg, #c8b890 0%, #b8a878 30%, #c4b08a 60%, #a89870 100%);
+  }
+
+  .marble-onix {
+    background: 
+      radial-gradient(ellipse 40% 80% at 30% 50%, rgba(180,120,40,0.3) 0%, transparent 60%),
+      radial-gradient(ellipse 30% 60% at 70% 30%, rgba(200,140,50,0.2) 0%, transparent 50%),
+      linear-gradient(145deg, #1a1408 0%, #2a200e 30%, #1e1a0c 60%, #281e0a 80%, #141008 100%);
+  }
+
+  .marble-rosa {
+    background: 
+      radial-gradient(ellipse 30% 70% at 40% 30%, rgba(200,160,155,0.25) 0%, transparent 55%),
+      linear-gradient(155deg, #c8a8a0 0%, #b89890 30%, #c4a09a 60%, #a88880 80%, #bc9c94 100%);
+  }
+
+  .marble-quartzito {
+    background: 
+      radial-gradient(ellipse 25% 65% at 35% 45%, rgba(200,180,160,0.2) 0%, transparent 50%),
+      linear-gradient(165deg, #a09080 0%, #b8a898 30%, #9a8878 60%, #aA9888 80%, #908070 100%);
+  }
+
+  .marble-granito-preto {
+    background: 
+      radial-gradient(circle 2px at 15% 20%, rgba(180,180,180,0.8) 0%, transparent 2px),
+      radial-gradient(circle 1px at 45% 60%, rgba(160,160,160,0.6) 0%, transparent 1px),
+      radial-gradient(circle 2px at 75% 35%, rgba(140,140,140,0.7) 0%, transparent 2px),
+      radial-gradient(circle 1px at 85% 80%, rgba(180,180,180,0.5) 0%, transparent 1px),
+      radial-gradient(circle 1px at 25% 75%, rgba(160,160,160,0.6) 0%, transparent 1px),
+      linear-gradient(140deg, #0e0e0e 0%, #181818 40%, #101010 70%, #1a1a1a 100%);
+  }
+
+  .marble-calacata {
+    background: 
+      linear-gradient(45deg, transparent 40%, rgba(180,160,140,0.12) 40%, rgba(180,160,140,0.12) 42%, transparent 42%),
+      linear-gradient(-30deg, transparent 30%, rgba(160,140,120,0.1) 30%, rgba(160,140,120,0.1) 32%, transparent 32%),
+      linear-gradient(160deg, #e8e4de 0%, #dcd8d0 25%, #e4e0d8 50%, #d8d4cc 75%, #e0dcd4 100%);
+  }
+
+  /* FEATURED SECTION */
+  .featured-section {
+    padding: 100px 60px;
+    background: var(--black);
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 80px;
+    align-items: center;
+  }
+
+  .featured-img-wrapper {
+    position: relative;
+    aspect-ratio: 4/5;
+    overflow: hidden;
+  }
+
+  .featured-img-wrapper::before {
+    content: '';
+    position: absolute;
+    inset: -2px;
+    border: 1px solid var(--green-mid);
+    z-index: 2;
+    pointer-events: none;
+  }
+
+  .featured-img-wrapper::after {
+    content: 'DESTAQUE';
+    position: absolute;
+    top: 24px;
+    right: -1px;
+    background: var(--green-accent);
+    color: var(--white);
+    font-family: 'Syncopate', sans-serif;
+    font-size: 0.5rem;
+    letter-spacing: 0.3em;
+    padding: 6px 14px;
+    z-index: 3;
+  }
+
+  .featured-stone-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .featured-content {
+    padding: 20px 0;
+  }
+
+  .featured-number {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 5rem;
+    font-weight: 300;
+    color: var(--graphite);
+    line-height: 1;
+    margin-bottom: 32px;
+    display: block;
+  }
+
+  .featured-title {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 3rem;
+    font-weight: 300;
+    color: var(--white);
+    line-height: 1.05;
+    margin-bottom: 24px;
+  }
+
+  .featured-desc {
+    font-size: 0.85rem;
+    line-height: 1.9;
+    color: var(--silver);
+    margin-bottom: 40px;
+  }
+
+  .featured-specs {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 24px;
+    margin-bottom: 48px;
+    padding: 28px;
+    border: 1px solid var(--graphite);
+    background: rgba(26,38,24,0.15);
+  }
+
+  .spec-item {}
+
+  .spec-label {
+    font-size: 0.6rem;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    color: var(--green-light);
+    margin-bottom: 6px;
+  }
+
+  .spec-value {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1rem;
+    color: var(--cream);
+  }
+
+  /* PROCESS SECTION */
+  .process-section {
+    padding: 100px 60px;
+    background: var(--charcoal);
+  }
+
+  .process-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 40px;
+    margin-top: 80px;
+  }
+
+  .process-item {
+    position: relative;
+    padding-top: 48px;
+    border-top: 1px solid var(--graphite);
+  }
+
+  .process-item::before {
+    content: '';
+    position: absolute;
+    top: -1px;
+    left: 0;
+    width: 40px;
+    height: 1px;
+    background: var(--green-accent);
+  }
+
+  .process-num {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 3rem;
+    font-weight: 300;
+    color: var(--graphite);
+    line-height: 1;
+    margin-bottom: 20px;
+  }
+
+  .process-title {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1.3rem;
+    font-weight: 400;
+    color: var(--white);
+    margin-bottom: 14px;
+  }
+
+  .process-desc {
+    font-size: 0.8rem;
+    line-height: 1.8;
+    color: var(--smoke);
+  }
+
+  /* CONTACT / CTA */
+  .cta-section {
+    padding: 120px 60px;
+    background: var(--green-deep);
+    border-top: 1px solid var(--green-mid);
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .cta-section::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image: 
+      linear-gradient(rgba(74,102,68,0.08) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(74,102,68,0.08) 1px, transparent 1px);
+    background-size: 60px 60px;
+  }
+
+  .cta-title {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: clamp(2.5rem, 5vw, 4.5rem);
+    font-weight: 300;
+    color: var(--white);
+    line-height: 1.1;
+    margin-bottom: 24px;
+    position: relative;
+  }
+
+  .cta-subtitle {
+    font-size: 0.85rem;
+    color: var(--green-light);
+    letter-spacing: 0.1em;
+    margin-bottom: 56px;
+    position: relative;
+  }
+
+  .cta-buttons {
+    display: flex;
+    gap: 16px;
+    justify-content: center;
+    position: relative;
+  }
+
+  .btn-primary {
+    background: var(--green-accent);
+    border: 1px solid var(--green-accent);
+    color: var(--white);
+    padding: 16px 48px;
+    font-family: 'Syncopate', sans-serif;
+    font-size: 0.6rem;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    text-decoration: none;
+    transition: all 0.3s;
+    cursor: pointer;
+  }
+
+  .btn-primary:hover {
+    background: transparent;
+    color: var(--green-light);
+  }
+
+  .btn-outline {
+    background: transparent;
+    border: 1px solid var(--green-mid);
+    color: var(--mist);
+    padding: 16px 48px;
+    font-family: 'Syncopate', sans-serif;
+    font-size: 0.6rem;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    text-decoration: none;
+    transition: all 0.3s;
+    cursor: pointer;
+  }
+
+  .btn-outline:hover {
+    border-color: var(--green-light);
+    color: var(--white);
+  }
+
+  /* FOOTER */
+  footer {
+    background: var(--black);
+    border-top: 1px solid var(--charcoal);
+    padding: 60px;
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr 1fr;
+    gap: 60px;
+  }
+
+  .footer-brand .logo {
+    display: block;
+    margin-bottom: 20px;
+  }
+
+  .footer-desc {
+    font-size: 0.8rem;
+    line-height: 1.8;
+    color: var(--smoke);
+    max-width: 240px;
+    margin-bottom: 32px;
+  }
+
+  .footer-social {
+    display: flex;
+    gap: 12px;
+  }
+
+  .social-link {
+    width: 36px;
+    height: 36px;
+    border: 1px solid var(--graphite);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--silver);
+    text-decoration: none;
+    font-size: 0.7rem;
+    transition: all 0.3s;
+  }
+
+  .social-link:hover {
+    border-color: var(--green-accent);
+    color: var(--green-light);
+    background: var(--green-deep);
+  }
+
+  .footer-col-title {
+    font-family: 'Syncopate', sans-serif;
+    font-size: 0.55rem;
+    letter-spacing: 0.35em;
+    text-transform: uppercase;
+    color: var(--green-light);
+    margin-bottom: 24px;
+  }
+
+  .footer-links {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .footer-links a {
+    font-size: 0.8rem;
+    color: var(--smoke);
+    text-decoration: none;
+    letter-spacing: 0.05em;
+    transition: color 0.3s;
+  }
+
+  .footer-links a:hover { color: var(--cream); }
+
+  .footer-bottom {
+    background: var(--black);
+    border-top: 1px solid var(--charcoal);
+    padding: 20px 60px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .footer-copy {
+    font-size: 0.7rem;
+    color: var(--stone);
+    letter-spacing: 0.1em;
+  }
+
+  .footer-legal {
+    display: flex;
+    gap: 24px;
+  }
+
+  .footer-legal a {
+    font-size: 0.65rem;
+    color: var(--stone);
+    text-decoration: none;
+    letter-spacing: 0.1em;
+    transition: color 0.3s;
+  }
+
+  .footer-legal a:hover { color: var(--silver); }
+
+  /* MODAL */
+  .modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.92);
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.4s;
+    backdrop-filter: blur(8px); 
+  }
+
+  .modal-overlay.active {
+    opacity: 1;
+    pointer-events: all;
+  }
+
+  .modal {
+    width: 85vw;
+    max-width: 960px;
+    max-height: 90vh;
+    background: var(--charcoal);
+    border: 1px solid var(--graphite);
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    overflow: hidden;
+    transform: translateY(20px);
+    transition: transform 0.4s;
+  }
+
+  .modal-overlay.active .modal {
+    transform: translateY(0);
+  }
+
+  .modal-img {
+    width: 100%;
+    height: 100%;
+    min-height: 400px;
+    object-fit: cover;
+  }
+
+  .modal-content {
+    padding: 48px 40px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    overflow-y: auto;
+  }
+
+  .modal-close {
+    position: absolute;
+    top: 24px;
+    right: 24px;
+    background: none;
+    border: none;
+    color: var(--silver);
+    font-size: 1.4rem;
+    cursor: pointer;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid var(--graphite);
+    transition: all 0.3s;
+    z-index: 10;
+  }
+
+  .modal-close:hover {
+    background: var(--graphite);
+    color: var(--white);
+  }
+
+  .modal-tag {
+    font-family: 'Syncopate', sans-serif;
+    font-size: 0.55rem;
+    letter-spacing: 0.4em;
+    color: var(--green-light);
+    text-transform: uppercase;
+    margin-bottom: 16px;
+  }
+
+  .modal-name {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 2.5rem;
+    font-weight: 300;
+    color: var(--white);
+    margin-bottom: 8px;
+  }
+
+  .modal-type {
+    font-size: 0.7rem;
+    letter-spacing: 0.2em;
+    color: var(--silver);
+    text-transform: uppercase;
+    margin-bottom: 28px;
+  }
+
+  .modal-desc {
+    font-size: 0.82rem;
+    line-height: 1.9;
+    color: var(--smoke);
+    margin-bottom: 32px;
+    border-left: 2px solid var(--green-accent);
+    padding-left: 16px;
+  }
+
+  .modal-specs {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+    padding: 24px;
+    background: var(--graphite);
+    margin-bottom: 32px;
+  }
+
+  .modal-spec-label {
+    font-size: 0.58rem;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    color: var(--green-light);
+    margin-bottom: 4px;
+  }
+
+  .modal-spec-value {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 0.95rem;
+    color: var(--cream);
+  }
+
+  .modal-btn {
+    background: var(--green-mid);
+    border: 1px solid var(--green-accent);
+    color: var(--cream);
+    padding: 14px 28px;
+    font-family: 'Syncopate', sans-serif;
+    font-size: 0.55rem;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: all 0.3s;
+    width: 100%;
+  }
+
+  .modal-btn:hover {
+    background: var(--green-accent);
+    color: var(--white);
+  }
+
+  /* ANIMATIONS */
+  @keyframes fadeInUp {
+    from { opacity: 0; transform: translateY(30px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .animate-in {
+    animation: fadeInUp 0.8s ease forwards;
+  }
+
+  .hero-content > * {
+    opacity: 0;
+    animation: fadeInUp 0.8s ease forwards;
+  }
+
+  .hero-eyebrow { animation-delay: 0.2s; }
+  .hero-title { animation-delay: 0.4s; }
+  .hero-subtitle { animation-delay: 0.6s; }
+  .hero-btn { animation-delay: 0.8s; }
+
+  /* Responsive */
+  @media (max-width: 900px) {
+    header { padding: 20px 24px; }
+    nav { display: none; }
+    .hero { padding: 60px 24px; }
+    .about-strip { padding: 24px; flex-wrap: wrap; }
+    .catalog-section, .featured-section, .process-section, .cta-section { padding: 60px 24px; }
+    .stone-grid { grid-template-columns: 1fr 1fr; }
+    .stone-card.featured { grid-column: span 2; }
+    .featured-section { grid-template-columns: 1fr; gap: 40px; }
+    .process-grid { grid-template-columns: 1fr 1fr; }
+    footer { grid-template-columns: 1fr 1fr; padding: 40px 24px; }
+    .modal { grid-template-columns: 1fr; width: 95vw; }
+    .modal-img { max-height: 300px; }
+    .footer-bottom { padding: 20px 24px; flex-direction: column; gap: 12px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header>
+  <a href="#" class="logo">LAP<span>I</span>DUS</a>
+  <nav>
+    <a href="#catalogo">Catálogo</a>
+    <a href="#processo">Processo</a>
+    <a href="#sobre">Sobre</a>
+    <a href="#contato" class="nav-cta">Solicitar Orçamento</a>
+  </nav>
+</header>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-bg"></div>
+  <div class="hero-grid"></div>
+  <div class="hero-texture"></div>
+
+  <div class="hero-content">
+    <div class="hero-eyebrow">Marmoraria Premium</div>
+    <h1 class="hero-title">
+      Pedras<br>
+      <em>Nobres</em><br>
+      Naturais
+    </h1>
+    <p class="hero-subtitle">
+      Seleção exclusiva de mármores, granitos e quartzitos<br>
+      extraídos das melhores pedreiras do mundo.
+    </p>
+    <a href="#catalogo" class="hero-btn">
+      <span>Ver Catálogo</span>
+      <div class="hero-btn-arrow"></div>
+    </a>
+  </div>
+
+  <div class="hero-scroll">
+    <div class="scroll-line"></div>
+    Scroll
+  </div>
+</section>
+
+<!-- ABOUT STRIP -->
+<div class="about-strip">
+  <div class="stat">
+    <div class="stat-num">48+</div>
+    <div class="stat-label">Tipos de Pedras</div>
+  </div>
+  <div class="stat-sep"></div>
+  <div class="stat">
+    <div class="stat-num">12</div>
+    <div class="stat-label">Países de Origem</div>
+  </div>
+  <div class="stat-sep"></div>
+  <div class="stat">
+    <div class="stat-num">23</div>
+    <div class="stat-label">Anos de Experiência</div>
+  </div>
+  <div class="stat-sep"></div>
+  <div class="stat">
+    <div class="stat-num">2.4k</div>
+    <div class="stat-label">Projetos Realizados</div>
+  </div>
+</div>
+
+<!-- CATALOG SECTION -->
+<section class="catalog-section" id="catalogo">
+  <div class="section-header">
+    <div>
+      <div class="section-tag">Nosso Acervo</div>
+      <h2 class="section-title">Catálogo de<br><em>Pedras Naturais</em></h2>
+    </div>
+    <a href="#" class="view-all">Ver todas as pedras →</a>
+  </div>
+
+  <div class="filter-bar">
+    <button class="filter-btn active" onclick="filterStones('todos', this)">Todos</button>
+    <button class="filter-btn" onclick="filterStones('marmore', this)">Mármore</button>
+    <button class="filter-btn" onclick="filterStones('granito', this)">Granito</button>
+    <button class="filter-btn" onclick="filterStones('quartzito', this)">Quartzito</button>
+    <button class="filter-btn" onclick="filterStones('travertino', this)">Travertino</button>
+    <button class="filter-btn" onclick="filterStones('onix', this)">Ônix</button>
+  </div>
+
+  <div class="stone-grid" id="stoneGrid">
+
+    <!-- Carrara Bianco - featured -->
+    <div class="stone-card featured" data-category="marmore" onclick="openModal(0)">
+      <div class="stone-img-wrapper">
+        <div class="marble-art marble-calacata" style="height:100%"></div>
+      </div>
+      <div class="stone-overlay"></div>
+      <div class="stone-info">
+        <div class="stone-origin">Itália · Carrara</div>
+        <div class="stone-name">Calacatta Oro</div>
+        <div class="stone-type">Mármore Premium</div>
+        <div class="stone-details">
+          <div class="stone-badge">Alta Demanda</div>
+          <div class="stone-action">Ver detalhes <div class="stone-action-line"></div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Nero Marquina -->
+    <div class="stone-card" data-category="marmore" onclick="openModal(1)">
+      <div class="stone-img-wrapper">
+        <div class="marble-art marble-nero" style="height:100%"></div>
+      </div>
+      <div class="stone-overlay"></div>
+      <div class="stone-info">
+        <div class="stone-origin">Espanha</div>
+        <div class="stone-name">Nero Marquina</div>
+        <div class="stone-type">Mármore</div>
+        <div class="stone-details">
+          <div class="stone-badge">Exclusivo</div>
+          <div class="stone-action">Ver <div class="stone-action-line"></div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Verde Guatemala -->
+    <div class="stone-card" data-category="marmore" onclick="openModal(2)">
+      <div class="stone-img-wrapper">
+        <div class="marble-art marble-verde" style="height:100%"></div>
+      </div>
+      <div class="stone-overlay"></div>
+      <div class="stone-info">
+        <div class="stone-origin">Guatemala</div>
+        <div class="stone-name">Verde Guatemala</div>
+        <div class="stone-type">Mármore</div>
+        <div class="stone-details">
+          <div class="stone-badge">Raro</div>
+          <div class="stone-action">Ver <div class="stone-action-line"></div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Travertino Romano -->
+    <div class="stone-card" data-category="travertino" onclick="openModal(3)">
+      <div class="stone-img-wrapper">
+        <div class="marble-art marble-travertino" style="height:100%"></div>
+      </div>
+      <div class="stone-overlay"></div>
+      <div class="stone-info">
+        <div class="stone-origin">Itália · Roma</div>
+        <div class="stone-name">Travertino Romano</div>
+        <div class="stone-type">Travertino</div>
+        <div class="stone-details">
+          <div class="stone-badge">Clássico</div>
+          <div class="stone-action">Ver <div class="stone-action-line"></div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Ônix Mel -->
+    <div class="stone-card" data-category="onix" onclick="openModal(4)">
+      <div class="stone-img-wrapper">
+        <div class="marble-art marble-onix" style="height:100%"></div>
+      </div>
+      <div class="stone-overlay"></div>
+      <div class="stone-info">
+        <div class="stone-origin">Turquia</div>
+        <div class="stone-name">Ônix Mel</div>
+        <div class="stone-type">Ônix</div>
+        <div class="stone-details">
+          <div class="stone-badge">Luxo</div>
+          <div class="stone-action">Ver <div class="stone-action-line"></div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Rosa Portugal -->
+    <div class="stone-card" data-category="marmore" onclick="openModal(5)">
+      <div class="stone-img-wrapper">
+        <div class="marble-art marble-rosa" style="height:100%"></div>
+      </div>
+      <div class="stone-overlay"></div>
+      <div class="stone-info">
+        <div class="stone-origin">Portugal</div>
+        <div class="stone-name">Rosa Portugal</div>
+        <div class="stone-type">Mármore</div>
+        <div class="stone-details">
+          <div class="stone-badge">Popular</div>
+          <div class="stone-action">Ver <div class="stone-action-line"></div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Quartzito Perola -->
+    <div class="stone-card" data-category="quartzito" onclick="openModal(6)">
+      <div class="stone-img-wrapper">
+        <div class="marble-art marble-quartzito" style="height:100%"></div>
+      </div>
+      <div class="stone-overlay"></div>
+      <div class="stone-info">
+        <div class="stone-origin">Brasil · MG</div>
+        <div class="stone-name">Quartzito Pérola</div>
+        <div class="stone-type">Quartzito</div>
+        <div class="stone-details">
+          <div class="stone-badge">Nacional</div>
+          <div class="stone-action">Ver <div class="stone-action-line"></div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Granito Preto -->
+    <div class="stone-card" data-category="granito" onclick="openModal(7)">
+      <div class="stone-img-wrapper">
+        <div class="marble-art marble-granito-preto" style="height:100%"></div>
+      </div>
+      <div class="stone-overlay"></div>
+      <div class="stone-info">
+        <div class="stone-origin">Brasil · BA</div>
+        <div class="stone-name">Granito Preto São Gabriel</div>
+        <div class="stone-type">Granito</div>
+        <div class="stone-details">
+          <div class="stone-badge">Alta Dureza</div>
+          <div class="stone-action">Ver <div class="stone-action-line"></div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Carrara Bianco -->
+    <div class="stone-card" data-category="marmore" onclick="openModal(8)">
+      <div class="stone-img-wrapper">
+        <div class="marble-art marble-carrara" style="height:100%"></div>
+      </div>
+      <div class="stone-overlay"></div>
+      <div class="stone-info">
+        <div class="stone-origin">Itália</div>
+        <div class="stone-name">Carrara Bianco</div>
+        <div class="stone-type">Mármore</div>
+        <div class="stone-details">
+          <div class="stone-badge">Clássico</div>
+          <div class="stone-action">Ver <div class="stone-action-line"></div></div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- FEATURED -->
+<section class="featured-section" id="sobre">
+  <div class="featured-img-wrapper">
+    <div class="marble-art marble-calacata" style="height:100%; min-height:500px; background: linear-gradient(160deg, #e8e4de 0%, #dcd8d0 25%, #e4e0d8 50%, rgba(210,190,160,0.4) 70%, #e0dcd4 100%);"></div>
+  </div>
+  <div class="featured-content">
+    <span class="featured-number">01</span>
+    <div>
+      <div class="section-tag">Pedra em Destaque</div>
+      <h2 class="featured-title">Calacatta<br>Oro Extra</h2>
+      <p class="featured-desc">
+        Extraído nas pedreiras históricas de Carrara, na Toscana italiana, o Calacatta Oro Extra é considerado um dos mármores mais nobres e cobiçados do mundo. Suas veias douradas sobre fundo branco cremoso criam composições únicas e irrepetíveis.
+      </p>
+      <div class="featured-specs">
+        <div class="spec-item">
+          <div class="spec-label">Origem</div>
+          <div class="spec-value">Carrara, Itália</div>
+        </div>
+        <div class="spec-item">
+          <div class="spec-label">Classificação</div>
+          <div class="spec-value">Mármore A+</div>
+        </div>
+        <div class="spec-item">
+          <div class="spec-label">Acabamentos</div>
+          <div class="spec-value">Polido, Escovado</div>
+        </div>
+        <div class="spec-item">
+          <div class="spec-label">Aplicações</div>
+          <div class="spec-value">Revestimento, Bancada</div>
+        </div>
+      </div>
+    </div>
+    <div style="display:flex;gap:12px;">
+      <button class="btn-primary" onclick="openModal(0)">Ver Detalhes</button>
+      <button class="btn-outline">Solicitar Amostra</button>
+    </div>
+  </div>
+</section>
+
+<!-- PROCESS -->
+<section class="process-section" id="processo">
+  <div>
+    <div class="section-tag">Nossa Metodologia</div>
+    <h2 class="section-title">Do Bloco à<br><em>Obra Finalizada</em></h2>
+  </div>
+
+  <div class="process-grid">
+    <div class="process-item">
+      <div class="process-num">01</div>
+      <div class="process-title">Seleção da Pedra</div>
+      <p class="process-desc">Cada bloco é inspecionado diretamente nas pedreiras de origem, garantindo padrão superior de qualidade, coloração e ausência de fraturas.</p>
+    </div>
+    <div class="process-item">
+      <div class="process-num">02</div>
+      <div class="process-title">Corte de Precisão</div>
+      <p class="process-desc">Utilizamos equipamentos CNC de última geração com margem de erro de 0,1mm, preservando as veias naturais e integridade estrutural da pedra.</p>
+    </div>
+    <div class="process-item">
+      <div class="process-num">03</div>
+      <div class="process-title">Acabamento Nobre</div>
+      <p class="process-desc">Polimento multi-etapas com lixa diamantada, oferecendo acabamentos: brilhante, acetinado, escovado, flameado ou jateado conforme projeto.</p>
+    </div>
+    <div class="process-item">
+      <div class="process-num">04</div>
+      <div class="process-title">Entrega e Instalação</div>
+      <p class="process-desc">Logística especializada com embalagem protetora e equipe técnica para instalação, com garantia de execução e suporte pós-obra.</p>
+    </div>
+  </div>
+</section>
+
+<!-- CTA -->
+<section class="cta-section" id="contato">
+  <h2 class="cta-title">Transforme<br><em>seu espaço</em><br>em obra de arte</h2>
+  <p class="cta-subtitle">Solicite uma visita técnica gratuita ou baixe nosso catálogo completo</p>
+  <div class="cta-buttons">
+    <a href="tel:+5561999999999" class="btn-primary">Falar com Especialista</a>
+    <a href="#catalogo" class="btn-outline">Baixar Catálogo PDF</a>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-brand">
+    <a href="#" class="logo">LAP<span>I</span>DUS</a>
+    <p class="footer-desc">Marmoraria premium com mais de duas décadas de excelência em pedras naturais, revestimentos e projetos especiais.</p>
+    <div class="footer-social">
+      <a href="#" class="social-link">in</a>
+      <a href="#" class="social-link">ig</a>
+      <a href="#" class="social-link">fb</a>
+      <a href="#" class="social-link">yt</a>
+    </div>
+  </div>
+  <div>
+    <div class="footer-col-title">Catálogo</div>
+    <ul class="footer-links">
+      <li><a href="#">Mármores</a></li>
+      <li><a href="#">Granitos</a></li>
+      <li><a href="#">Quartzitos</a></li>
+      <li><a href="#">Travertinos</a></li>
+      <li><a href="#">Ônix</a></li>
+      <li><a href="#">Pedras Exóticas</a></li>
+    </ul>
+  </div>
+  <div>
+    <div class="footer-col-title">Serviços</div>
+    <ul class="footer-links">
+      <li><a href="#">Corte e Polimento</a></li>
+      <li><a href="#">Revestimento</a></li>
+      <li><a href="#">Bancadas</a></li>
+      <li><a href="#">Escadas</a></li>
+      <li><a href="#">Projetos Especiais</a></li>
+      <li><a href="#">Restauração</a></li>
+    </ul>
+  </div>
+  <div>
+    <div class="footer-col-title">Contato</div>
+    <ul class="footer-links">
+      <li><a href="#">(61) 9 9999-9999</a></li>
+      <li><a href="#">contato@lapidus.com.br</a></li>
+      <li><a href="#">Brasília, DF</a></li>
+      <li><a href="#">Seg–Sex: 8h–18h</a></li>
+      <li><a href="#">Sáb: 8h–13h</a></li>
+    </ul>
+  </div>
+</footer>
+
+<div class="footer-bottom">
+  <span class="footer-copy">© 2025 Lapidus Marmoraria. Todos os direitos reservados.</span>
+  <div class="footer-legal">
+    <a href="#">Política de Privacidade</a>
+    <a href="#">Termos de Uso</a>
+  </div>
+</div>
+
+<!-- MODAL -->
+<div class="modal-overlay" id="modalOverlay" onclick="closeModalOutside(event)">
+  <div class="modal" id="modal">
+    <div class="stone-img-wrapper" style="min-height:400px;">
+      <div id="modalStoneArt" class="marble-art" style="height:100%;min-height:400px;"></div>
+    </div>
+    <div class="modal-content">
+      <button class="modal-close" onclick="closeModal()">✕</button>
+      <div>
+        <div class="modal-tag" id="modalOrigin">Itália · Carrara</div>
+        <div class="modal-name" id="modalName">Calacatta Oro</div>
+        <div class="modal-type" id="modalType">Mármore Premium</div>
+        <p class="modal-desc" id="modalDesc">Descrição da pedra.</p>
+        <div class="modal-specs" id="modalSpecs"></div>
+      </div>
+      <button class="modal-btn">Solicitar Orçamento para Esta Pedra</button>
+    </div>
+  </div>
+</div>
+
+<script>
+  const stones = [
+    {
+      name: 'Calacatta Oro Extra',
+      type: 'Mármore Premium',
+      origin: 'Itália · Carrara',
+      art: 'marble-calacata',
+      bgStyle: 'background: linear-gradient(160deg, #e8e4de 0%, #dcd8d0 25%, #e4e0d8 50%, rgba(210,190,160,0.4) 70%, #e0dcd4 100%);',
+      desc: 'O Calacatta Oro Extra é extraído nas lendárias pedreiras de Carrara, na Toscana. Caracteriza-se por seu fundo branco avelã com marcantes veias douradas e acastanhadas. Cada chapa é única, tornando-o o mármore mais cobiçado em projetos de alto padrão no mundo inteiro.',
+      specs: [
+        { label: 'Origem', value: 'Carrara, Itália' },
+        { label: 'Classificação', value: 'Mármore A+' },
+        { label: 'Dureza Mohs', value: '3 – 4' },
+        { label: 'Densidade', value: '2.72 g/cm³' },
+        { label: 'Acabamentos', value: 'Polido, Escovado' },
+        { label: 'Aplicações', value: 'Bancada, Revestimento, Piso' }
+      ]
+    },
+    {
+      name: 'Nero Marquina',
+      type: 'Mármore',
+      origin: 'País Basco, Espanha',
+      art: 'marble-nero',
+      bgStyle: '',
+      desc: 'O Nero Marquina é um dos mármores negros mais elegantes e sofisticados disponíveis no mercado. Originário do País Basco espanhol, suas veias brancas contrastam dramaticamente com o fundo negro profundo, criando um visual inconfundível de luxo contemporâneo.',
+      specs: [
+        { label: 'Origem', value: 'País Basco, ES' },
+        { label: 'Classificação', value: 'Mármore A' },
+        { label: 'Dureza Mohs', value: '3 – 4' },
+        { label: 'Densidade', value: '2.70 g/cm³' },
+        { label: 'Acabamentos', value: 'Polido, Honed' },
+        { label: 'Aplicações', value: 'Piso, Revestimento, Escada' }
+      ]
+    },
+    {
+      name: 'Verde Guatemala',
+      type: 'Mármore',
+      origin: 'Guatemala',
+      art: 'marble-verde',
+      bgStyle: '',
+      desc: 'Pedra de rara beleza, o Verde Guatemala apresenta tonalidades profundas de verde com veias e inclusões de calcita branca. É uma das rochas mais exóticas para projetos de design de interiores de alto padrão, utilizada em palácios e hotéis ao redor do mundo.',
+      specs: [
+        { label: 'Origem', value: 'Guatemala' },
+        { label: 'Classificação', value: 'Mármore Exótico' },
+        { label: 'Dureza Mohs', value: '3.5' },
+        { label: 'Densidade', value: '2.68 g/cm³' },
+        { label: 'Acabamentos', value: 'Polido' },
+        { label: 'Aplicações', value: 'Revestimento, Decoração' }
+      ]
+    },
+    {
+      name: 'Travertino Romano',
+      type: 'Travertino',
+      origin: 'Tivoli, Itália',
+      art: 'marble-travertino',
+      bgStyle: '',
+      desc: 'Extraído nas proximidades de Roma, o Travertino Romano carrega séculos de história na arquitetura clássica — foi utilizado no Coliseu romano. Com suas tonalidades cálidas de marfim e bege, é perfeito para criar ambientes aconchegantes e atemporais.',
+      specs: [
+        { label: 'Origem', value: 'Tivoli, Itália' },
+        { label: 'Classificação', value: 'Travertino A' },
+        { label: 'Dureza Mohs', value: '3' },
+        { label: 'Densidade', value: '2.30 g/cm³' },
+        { label: 'Acabamentos', value: 'Polido, Rústico' },
+        { label: 'Aplicações', value: 'Piso, Fachada, Revestimento' }
+      ]
+    },
+    {
+      name: 'Ônix Mel',
+      type: 'Ônix',
+      origin: 'Turquia',
+      art: 'marble-onix',
+      bgStyle: '',
+      desc: 'O Ônix Mel turco é uma pedra semipreciosa de extraordinária beleza translúcida. Suas tonalidades que vão do âmbar ao mel com veias bege e marrom criam efeitos luminosos incomparáveis quando retroiluminado. Uma escolha audaciosa para projetos de luxo extremo.',
+      specs: [
+        { label: 'Origem', value: 'Turquia' },
+        { label: 'Classificação', value: 'Ônix Premium' },
+        { label: 'Translucidez', value: 'Alta' },
+        { label: 'Espessura Ideal', value: '20 – 30mm' },
+        { label: 'Acabamentos', value: 'Polido' },
+        { label: 'Aplicações', value: 'Painéis, Balcões, Decoração' }
+      ]
+    },
+    {
+      name: 'Rosa Portugal',
+      type: 'Mármore',
+      origin: 'Alentejo, Portugal',
+      art: 'marble-rosa',
+      bgStyle: '',
+      desc: 'O Rosa Portugal é o mármore nacional português mais reconhecido internacionalmente. Com seu característico fundo rosa salmão e veias esbranquiçadas, confere elegância e sofisticação a qualquer ambiente. Muito utilizado em pisos, escadas e revestimentos de fachada.',
+      specs: [
+        { label: 'Origem', value: 'Alentejo, Portugal' },
+        { label: 'Classificação', value: 'Mármore A' },
+        { label: 'Dureza Mohs', value: '3.5' },
+        { label: 'Densidade', value: '2.71 g/cm³' },
+        { label: 'Acabamentos', value: 'Polido, Honed, Escovado' },
+        { label: 'Aplicações', value: 'Piso, Fachada, Escada' }
+      ]
+    },
+    {
+      name: 'Quartzito Pérola',
+      type: 'Quartzito',
+      origin: 'Minas Gerais, Brasil',
+      art: 'marble-quartzito',
+      bgStyle: '',
+      desc: 'O Quartzito Pérola é uma joia geológica brasileira, formada ao longo de milhões de anos nas serras mineiras. Com tonalidades que variam entre cinza pérola, bege e terracota, oferece a beleza do mármore com a durabilidade superior do quartzito, ideal para áreas de alto tráfego.',
+      specs: [
+        { label: 'Origem', value: 'Minas Gerais, BR' },
+        { label: 'Classificação', value: 'Quartzito Premium' },
+        { label: 'Dureza Mohs', value: '6 – 7' },
+        { label: 'Densidade', value: '2.65 g/cm³' },
+        { label: 'Acabamentos', value: 'Polido, Escovado, Natural' },
+        { label: 'Aplicações', value: 'Piso, Fachada, Área Externa' }
+      ]
+    },
+    {
+      name: 'Granito Preto São Gabriel',
+      type: 'Granito',
+      origin: 'Bahia, Brasil',
+      art: 'marble-granito-preto',
+      bgStyle: '',
+      desc: 'Extraído na região de São Gabriel, na Bahia, este granito negro com cristais prateados é símbolo de resistência e elegância. Com altíssima dureza e baixa porosidade, é a escolha ideal para bancadas de cozinha, piso de área externa e revestimentos de grande exigência.',
+      specs: [
+        { label: 'Origem', value: 'Bahia, Brasil' },
+        { label: 'Classificação', value: 'Granito A' },
+        { label: 'Dureza Mohs', value: '6 – 7' },
+        { label: 'Densidade', value: '2.78 g/cm³' },
+        { label: 'Acabamentos', value: 'Polido, Flameado' },
+        { label: 'Aplicações', value: 'Bancada, Piso, Fachada' }
+      ]
+    },
+    {
+      name: 'Carrara Bianco Venato',
+      type: 'Mármore',
+      origin: 'Carrara, Itália',
+      art: 'marble-carrara',
+      bgStyle: '',
+      desc: 'O Carrara Bianco Venato é o clássico atemporal da marmoraria. Com fundo branco levemente acinzentado e veias suaves em cinza, é versátil e elegante. Utilizado desde a Antiguidade em esculturas e arquitetura, continua sendo uma das escolhas mais refinadas para ambientes modernos e clássicos.',
+      specs: [
+        { label: 'Origem', value: 'Carrara, Itália' },
+        { label: 'Classificação', value: 'Mármore A' },
+        { label: 'Dureza Mohs', value: '3 – 4' },
+        { label: 'Densidade', value: '2.71 g/cm³' },
+        { label: 'Acabamentos', value: 'Polido, Honed, Escovado' },
+        { label: 'Aplicações', value: 'Piso, Revestimento, Bancada, Banheiro' }
+      ]
+    }
+  ];
+
+  const artStyles = {
+    'marble-calacata': 'background: linear-gradient(160deg, #e8e4de 0%, #dcd8d0 25%, #e4e0d8 50%, rgba(210,190,160,0.3) 70%, #e0dcd4 100%); background-size: cover;',
+    'marble-nero': 'background: radial-gradient(ellipse 20% 60% at 30% 20%, rgba(80,75,60,0.4) 0%, transparent 50%), radial-gradient(ellipse 30% 40% at 70% 80%, rgba(60,55,45,0.3) 0%, transparent 40%), linear-gradient(150deg, #0e0e0c 0%, #1a1a16 25%, #141410 50%, #1e1e18 75%, #0a0a08 100%);',
+    'marble-verde': 'background: radial-gradient(ellipse 35% 70% at 25% 40%, rgba(40,70,35,0.5) 0%, transparent 55%), linear-gradient(130deg, #1a2e18 0%, #243c20 30%, #1c3018 60%, #2a4025 80%, #182814 100%);',
+    'marble-travertino': 'background: repeating-linear-gradient(5deg, transparent 0px, transparent 8px, rgba(160,140,100,0.06) 8px, rgba(160,140,100,0.06) 9px), linear-gradient(160deg, #c8b890 0%, #b8a878 30%, #c4b08a 60%, #a89870 100%);',
+    'marble-onix': 'background: radial-gradient(ellipse 40% 80% at 30% 50%, rgba(180,120,40,0.3) 0%, transparent 60%), linear-gradient(145deg, #1a1408 0%, #2a200e 30%, #1e1a0c 60%, #281e0a 80%, #141008 100%);',
+    'marble-rosa': 'background: radial-gradient(ellipse 30% 70% at 40% 30%, rgba(200,160,155,0.25) 0%, transparent 55%), linear-gradient(155deg, #c8a8a0 0%, #b89890 30%, #c4a09a 60%, #a88880 80%, #bc9c94 100%);',
+    'marble-quartzito': 'background: radial-gradient(ellipse 25% 65% at 35% 45%, rgba(200,180,160,0.2) 0%, transparent 50%), linear-gradient(165deg, #a09080 0%, #b8a898 30%, #9a8878 60%, #aA9888 80%, #908070 100%);',
+    'marble-granito-preto': 'background: radial-gradient(circle 2px at 15% 20%, rgba(180,180,180,0.8) 0%, transparent 2px), radial-gradient(circle 1px at 45% 60%, rgba(160,160,160,0.6) 0%, transparent 1px), radial-gradient(circle 2px at 75% 35%, rgba(140,140,140,0.7) 0%, transparent 2px), linear-gradient(140deg, #0e0e0e 0%, #181818 40%, #101010 70%, #1a1a1a 100%);',
+    'marble-carrara': 'background: radial-gradient(ellipse 30% 80% at 20% 30%, rgba(180,180,180,0.15) 0%, transparent 60%), linear-gradient(170deg, #d4d0c8 0%, #c8c4bc 20%, #b8b4ac 40%, #ccc8c0 60%, #d0ccc4 80%, #c4c0b8 100%);'
+  };
+
+  function openModal(index) {
+    const stone = stones[index];
+    document.getElementById('modalOrigin').textContent = stone.origin;
+    document.getElementById('modalName').textContent = stone.name;
+    document.getElementById('modalType').textContent = stone.type;
+    document.getElementById('modalDesc').textContent = stone.desc;
+
+    const art = document.getElementById('modalStoneArt');
+    art.className = 'marble-art';
+    art.style.cssText = 'height:100%; min-height:400px; ' + (artStyles[stone.art] || '');
+
+    const specsEl = document.getElementById('modalSpecs');
+    specsEl.innerHTML = stone.specs.map(s => `
+      <div>
+        <div class="modal-spec-label">${s.label}</div>
+        <div class="modal-spec-value">${s.value}</div>
+      </div>
+    `).join('');
+
+    document.getElementById('modalOverlay').classList.add('active');
+    document.body.style.overflow = 'hidden';
+  }
+
+  function closeModal() {
+    document.getElementById('modalOverlay').classList.remove('active');
+    document.body.style.overflow = '';
+  }
+
+  function closeModalOutside(e) {
+    if (e.target.id === 'modalOverlay') closeModal();
+  }
+
+  function filterStones(category, btn) {
+    document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    document.querySelectorAll('.stone-card').forEach(card => {
+      if (category === 'todos' || card.dataset.category === category) {
+        card.style.display = '';
+      } else {
+        card.style.display = 'none';
+      }
+    });
+  }
+
+  document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
+
+  // Scroll reveal
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.style.opacity = '1';
+        entry.target.style.transform = 'translateY(0)';
+      }
+    });
+  }, { threshold: 0.1 });
+
+  document.querySelectorAll('.stone-card, .process-item, .stat').forEach(el => {
+    el.style.opacity = '0';
+    el.style.transform = 'translateY(20px)';
+    el.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
+    observer.observe(el);
+  });
+</script>
+
+</body>
+</html>
